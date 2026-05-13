@@ -278,11 +278,14 @@ function OwnerDashboard() {
             borderRight: "none",
             px: 2,
             py: 3,
-            display: "flex"
+            pb: 4,
+            display: "flex",
+            boxSizing: "border-box",
+            overflowY: "auto"
           }
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100%" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100%", pb: 1 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, px: 1.5, mb: 4 }}>
             <Box
               sx={{
@@ -352,7 +355,7 @@ function OwnerDashboard() {
             </List>
           </Box>
 
-          <Box sx={{ mt: "auto", pt: 4 }}>
+          <Box sx={{ mt: "auto", pt: 4, pb: 2 }}>
             <Divider sx={{ borderColor: "rgba(255,255,255,0.12)", mb: 2 }} />
             <Box
               sx={{

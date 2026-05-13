@@ -30,27 +30,27 @@ import {
 
 const services = [
   {
-    title: "Hair Cut & Styling",
+    title: "Hair Cut Styling",
     description:
-      "Precision cuts and signature styling tailored to your face shape, texture, and personality.",
+      "Precise hairstyles and signature looks are created for your face shape, texture of your hair and individual character.",
     icon: <ContentCutIcon sx={{ fontSize: 34 }} />
   },
   {
     title: "Facials & Skin Care",
     description:
-      "Glow-focused skin rituals designed to refresh, hydrate, and restore your natural radiance.",
+      "Skin treatments focus on creating a glow by using revitalizing products to provide your skin with moisture to help restore its natural beauty.",
     icon: <FaceRetouchingNaturalIcon sx={{ fontSize: 34 }} />
   },
   {
     title: "Hair Coloring",
     description:
-      "Rich color services from subtle glossing to bold transformations with salon-grade products.",
+      "Hair can be enhanced with colour by way of gleaming highlights or bold reds through the use of professional products.",
     icon: <ColorLensIcon sx={{ fontSize: 34 }} />
   },
   {
     title: "Keratin Treatments",
     description:
-      "Smooth, soft, frizz-controlled finishes that keep your hair polished and manageable for weeks.",
+      "Control and significantly reduce frizz in your hair while enhancing its overall texture, leaving it feeling soft, silky, and smooth. This helps your hair appear more polished, healthy, and well-groomed.",
     icon: <SpaIcon sx={{ fontSize: 34 }} />
   }
 ];
@@ -65,19 +65,19 @@ const reasons = [
   {
     title: "Premium Products",
     description:
-      "We use trusted professional products that protect your hair and elevate every treatment.",
+      "We use trusted professional products that protect your hair and elevate every superior care and performance. ",
     icon: <DiamondIcon sx={{ fontSize: 38 }} />
   },
   {
     title: "Relaxing Atmosphere",
     description:
-      "A warm, dark-luxe salon mood designed to feel calm, elevated, and welcoming from the first step.",
+      "A warm, dark-luxe salon mood designed to feel calm, elevated, and welcoming from the first step, offering comfort, elegance, and a sense of luxury.",
     icon: <SelfImprovementIcon sx={{ fontSize: 38 }} />
   },
   {
     title: "Personalized Service",
     description:
-      "Every appointment is shaped around your goals so the result feels custom, not generic.",
+      "Every appointment is shaped around your goals so the result feels custom, not generic, delivering a truly refined and personalized salon experience.",
     icon: <FavoriteIcon sx={{ fontSize: 38 }} />
   }
 ];
@@ -591,15 +591,26 @@ function AuthPage() {
               backdropFilter: "blur(18px)"
             }}
           >
-            <Typography sx={{ color: "#f59e0b", letterSpacing: 3, textTransform: "uppercase", fontSize: 12 }}>
-              Welcome Back
+            <Typography sx={{ color: "#fbbf24", letterSpacing: 4, textTransform: "uppercase", fontSize: 12 }}>
+              WELCOME BACK
             </Typography>
-            <Typography sx={{ fontSize: { xs: 30, md: 40 }, fontWeight: 800, mb: 1 }}>
-              Book Your Luxe Moment
+            <Typography
+              sx={{
+                fontSize: { xs: 30, md: 40 },
+                fontWeight: 900,
+                mb: 1,
+                lineHeight: 1.1,
+                letterSpacing: 0.4,
+                background: "linear-gradient(135deg, #fff7d6 0%, #fbbf24 45%, #b45309 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent"
+              }}
+            >
+              Book Your Luxe Experience ?
             </Typography>
             <Typography sx={{ color: "rgba(248,250,252,0.72)", mb: 3, lineHeight: 1.8 }}>
-              Log in or create your account to manage appointments, discover services, and experience
-              HAIRSALON with a personalized touch.
+              Sign in to manage your appointments, explore premium services, and enjoy a personalized salon experience.
             </Typography>
 
             <Tabs
@@ -788,11 +799,27 @@ function AuthPage() {
                   fontSize: 16,
                   fontWeight: 800,
                   letterSpacing: 0.4,
-                  background: "linear-gradient(135deg, #f97316, #fbbf24)",
+                  background: "linear-gradient(135deg, #fbbf24, #fde68a)",
                   color: "#111827",
-                  boxShadow: "0 14px 30px rgba(249,115,22,0.35)",
+                  boxShadow: "0 14px 30px rgba(251,191,36,0.32)",
+                  transition: "transform 180ms ease, box-shadow 180ms ease, filter 180ms ease",
                   "&:hover": {
-                    background: "linear-gradient(135deg, #ea580c, #f59e0b)"
+                    background: "linear-gradient(135deg, #fbbf24, #fff7d6)",
+                    transform: "scale(1.03)",
+                    boxShadow: "0 0 20px rgba(251,191,36,0.4)"
+                  },
+                  "&:active": {
+                    transform: "scale(0.99)",
+                    boxShadow: "0 0 12px rgba(251,191,36,0.28)"
+                  },
+                  "&:focus-visible": {
+                    outline: "2px solid rgba(251,191,36,0.45)",
+                    outlineOffset: 2
+                  },
+                  "&.Mui-disabled": {
+                    background: "rgba(255,255,255,0.12)",
+                    color: "rgba(255,255,255,0.4)",
+                    boxShadow: "none"
                   }
                 }}
                 disabled={
@@ -809,6 +836,52 @@ function AuthPage() {
               >
                 {tab === 0 ? "Enter HAIRSALON" : "Create Your Account"}
               </Button>
+
+              <Box
+                sx={{
+                  mt: 2.5,
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
+                  gap: 1,
+                  color: "rgba(248,250,252,0.82)"
+                }}
+              >
+                {["Secure login", "1000+ happy customers", "Trusted salon services"].map((item) => (
+                  <Box
+                    key={item}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      p: 1.2,
+                      borderRadius: 2,
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(255,255,255,0.08)"
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 18,
+                        height: 18,
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "rgba(251,191,36,0.18)",
+                        color: "#fbbf24",
+                        fontSize: 12,
+                        fontWeight: 900,
+                        flex: "0 0 auto"
+                      }}
+                    >
+                      ✔
+                    </Box>
+                    <Typography sx={{ fontSize: 13, fontWeight: 600, lineHeight: 1.4 }}>
+                      {item}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
             </Box>
           </Paper>
         </Box>
@@ -910,6 +983,11 @@ function AuthPage() {
             </Typography>
             <Box sx={{ display: "flex", gap: 2 }}>
               <Box
+                component="a"
+                href="https://www.facebook.com/"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Open Facebook"
                 sx={{
                   width: 40,
                   height: 40,
@@ -917,12 +995,19 @@ function AuthPage() {
                   background: "#f97316",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  justifyContent: "center",
+                  textDecoration: "none",
+                  cursor: "pointer"
                 }}
               >
                 <FacebookIcon sx={{ color: "white", fontSize: 20 }} />
               </Box>
               <Box
+                component="a"
+                href="https://www.instagram.com/"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Open Instagram"
                 sx={{
                   width: 40,
                   height: 40,
@@ -930,7 +1015,9 @@ function AuthPage() {
                   background: "#f97316",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  justifyContent: "center",
+                  textDecoration: "none",
+                  cursor: "pointer"
                 }}
               >
                 <InstagramIcon sx={{ color: "white", fontSize: 20 }} />

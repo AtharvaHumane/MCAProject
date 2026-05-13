@@ -53,134 +53,233 @@ const salonGalleryImages = [
 
 const getSalonImage = (index = 0) => salonGalleryImages[index % salonGalleryImages.length];
 
-const serviceCatalog = [
+const serviceCatalogBase = [
   {
     type: "Hair Cut",
-    subtitle: "Clean cuts, fades, and premium styling for every look.",
-    image:
-      "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=900&q=80",
+    subtitle: "Professional cuts for every style and personality.",
+    image: "https://thumbs.dreamstime.com/b/professional-hair-cutting-tools-organized-neatly-barbers-workbench-ready-use-comprehensive-collection-barbering-416355282.jpghttps://thumbs.dreamstime.com/b/various-hair-dresser-cut-tools-black-background-copy-space-various-hair-dresser-tools-161810714.jpg",
     items: [
-      { name: "Basic Hair Cut", price: 150, subtitle: "Neat everyday grooming" },
-      { name: "Stylish Hair Cut", price: 250, subtitle: "Modern cut with shape" },
-      { name: "Layer Cut", price: 300, subtitle: "Adds texture and movement" },
-      { name: "Step Cut", price: 300, subtitle: "Layered stepped finish" },
-      { name: "Fade Cut", price: 350, subtitle: "Sharp taper with clean edges" },
-      { name: "Undercut", price: 300, subtitle: "Bold top-heavy style" },
-      { name: "Kids Hair Cut", price: 120, subtitle: "Simple and comfortable" },
-      { name: "Senior Citizen Cut", price: 100, subtitle: "Gentle, tidy grooming" },
-      { name: "Beard + Hair Combo Cut", price: 400, subtitle: "Complete head-to-beard look" },
-      { name: "Premium Salon Cut", price: 500, subtitle: "Signature luxury styling" }
+      { name: "Basic Hair Cut", price: 150, subtitle: "Neat everyday grooming", image: "https://images.unsplash.com/photo-1606333259737-6da197890fa2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFzaWMlMjBoYWlyJTIwY3V0fGVufDB8MHwwfHx8MA%3D%3D" },
+      { name: "Stylish Hair Cut", price: 250, subtitle: "Modern cut with shape", image: "https://images.unsplash.com/photo-1593702275687-f8b402bf1fb5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8U3R5bGlzaCUyMEhhaXIlMjBDdXR8ZW58MHwwfDB8fHww" },
+      { name: "Layer Cut", price: 300, subtitle: "Adds texture and movement", image: "https://images.unsplash.com/photo-1647462741351-4e7a5e7317c7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8TGF5ZXIlMjBDdXR8ZW58MHwwfDB8fHww" },
+      { name: "Step Cut", price: 300, subtitle: "Layered stepped finish", image: "https://images.unsplash.com/photo-1602982903808-29f783644d21?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHN0ZXAlMjBDdXR8ZW58MHwwfDB8fHww" },
+      { name: "Fade Cut", price: 350, subtitle: "Sharp taper with clean edges", image: "https://plus.unsplash.com/premium_photo-1661288513057-8537363b1756?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8ZmFkZSUyMEN1dHxlbnwwfDB8MHx8fDA%3D" },
+      { name: "Undercut", price: 300, subtitle: "Bold top-heavy style", image: "https://images.unsplash.com/photo-1541533848490-bc8115cd6522?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHVuZGVyQ3V0fGVufDB8MHwwfHx8MA%3D%3D" },
+      { name: "Kids Hair Cut", price: 120, subtitle: "Simple and comfortable", image: "https://images.unsplash.com/photo-1521490683712-35a1cb235d1c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGtpZHMlMjBDdXR8ZW58MHwwfDB8fHww" },
+      { name: "Senior Citizen Cut", price: 100, subtitle: "Gentle, tidy grooming", image: "https://images.unsplash.com/photo-1758732461536-90cd5033a4d2?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fFNlbmlvciUyMENpdGl6ZW4lMjBDdXR8ZW58MHwwfDB8fHww" },
+      { name: "Beard + Hair Combo Cut", price: 400, subtitle: "Complete head-to-beard look", image: "https://images.unsplash.com/photo-1590410240244-9c28d8c26d3c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8QmVhcmQlMjAlMkIlMjBIYWlyJTIwQ29tYm8lMjBDdXR8ZW58MHwwfDB8fHww" },
+      { name: "Premium Salon Cut", price: 500, subtitle: "Signature luxury styling", image: "https://plus.unsplash.com/premium_photo-1661380558859-40df8dd91dfd?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8UHJlbWl1bSUyMFNhbG9uJTIwQ3V0fGVufDB8MHwwfHx8MA%3D%3D" }
     ]
   },
   {
     type: "Beard",
     subtitle: "Sharp beard trims, clean shaves, and grooming rituals.",
     image:
-      "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80",
+      "https://poojabeautyparlourwgl.com/wp-content/uploads/2022/01/portfolio-03-800x500.jpg",
     items: [
-      { name: "Basic Beard Trim", price: 80, subtitle: "Quick tidy-up trim" },
-      { name: "Beard Styling", price: 150, subtitle: "Shape and style control" },
-      { name: "Clean Shave", price: 100, subtitle: "Smooth finish shave" },
-      { name: "Razor Shave", price: 120, subtitle: "Classic barber razor work" },
-      { name: "Beard Design", price: 180, subtitle: "Detailed design shaping" },
-      { name: "Long Beard Set", price: 200, subtitle: "Controlled long-beard styling" },
-      { name: "Beard Color", price: 250, subtitle: "Natural-looking color refresh" },
-      { name: "Beard Spa", price: 300, subtitle: "Deep care and softening" },
-      { name: "Hot Towel Shave", price: 180, subtitle: "Relaxing hot towel treatment" },
-      { name: "Premium Beard Grooming", price: 350, subtitle: "Luxury grooming service" }
+      { name: "Basic Beard Trim", price: 80, subtitle: "Quick tidy-up trim", image: "https://plus.unsplash.com/premium_photo-1661493935776-a76a3e33dddf?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8QmFzaWMlMjBCZWFyZCUyMFRyaW18ZW58MHwwfDB8fHww" },
+      { name: "Short Beard Trim", price: 150, subtitle: "Shape and style control", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZpt9altvSBZ4oFPwUzJEcpxMxFpLR3uQ7cA&s" },
+      { name: "Medium Beard Styling", price: 100, subtitle: "Smooth finish shave", image: "https://images.unsplash.com/photo-1621095346111-a25f48b39b66?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8TWVkaXVtJTIwQmVhcmQlMjBTdHlsaW5nfGVufDB8MHwwfHx8MA%3D%3D" },
+      { name: "Full Beard Shaping", price: 120, subtitle: "Classic barber razor work", image: "https://blogscdn.thehut.net/app/uploads/sites/571/2019/08/shape-beard-neckline_1565007989-2-1_1601627493.jpg" },
+      { name: "Fade Beard Trim", price: 180, subtitle: "Detailed design shaping", image: "https://plus.unsplash.com/premium_photo-1661645788141-8196a45fb483?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8RmFkZSUyMEJlYXJkJTIwVHJpbXxlbnwwfDB8MHx8fDA%3D" },
+      { name: "Contour Beard Trim", price: 200, subtitle: "Controlled long-beard styling", image: "https://images.squarespace-cdn.com/content/v1/5616c8cde4b0bbc1cabb7c79/1687902121631-CDHY1N4F7YYZ56B3NCOA/barber-using-shaving-cream-contour-male-customer-s-beard.jpg?format=1500w" },
+      { name: "Designer Beard Styling", price: 250, subtitle: "Natural-looking color refresh", image: "https://mxp-media.ilnmedia.com/media/content/2020/Mar/Hottest-Beard-Styles-Of-20205_5e64d0f62ba5f.jpeg?w=450&h=337.5" },
+      { name: "Tapered Beard Trim", price: 300, subtitle: "Deep care and softening", image: "https://images.unsplash.com/photo-1654097803253-d481b6751f29?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8VGFwZXJlZCUyMEJlYXJkJTIwVHJpbXxlbnwwfDB8MHx8fDA%3D" },
+      { name: "Beard + Mustache Styling", price: 180, subtitle: "Relaxing hot towel treatment", image: "https://hairstyleonpoint.com/wp-content/uploads/2021/03/Full-Beard-and-Mustache.jpg" },
+      { name: "Premium Beard Grooming", price: 350, subtitle: "Luxury grooming service", image: "https://images.unsplash.com/photo-1533808232502-bee53575c3af?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8UHJlbWl1bSUyMEJlYXJkJTIwR3Jvb21pbmd8ZW58MHwwfDB8fHww" }
     ]
   },
   {
     type: "Massage",
     subtitle: "Relaxing massage therapies for body and mind.",
     image:
-      "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=900&q=80",
+      "https://c8.alamy.com/zooms/9/e5c87f1c41dc45a6838f632842db92ca/2dawe64.jpg",
     items: [
-      { name: "Head Massage", price: 100, subtitle: "Quick stress relief" },
-      { name: "Oil Head Massage", price: 150, subtitle: "Deep soothing scalp care" },
-      { name: "Shoulder Massage", price: 120, subtitle: "Release upper-body tension" },
-      { name: "Full Body Massage", price: 600, subtitle: "Complete body relaxation" },
-      { name: "Foot Massage", price: 150, subtitle: "Rest and recovery for feet" },
-      { name: "Neck Massage", price: 120, subtitle: "Ease tight neck muscles" },
-      { name: "Relaxation Massage", price: 400, subtitle: "Calming wellness session" },
-      { name: "Deep Tissue Massage", price: 700, subtitle: "Targeted muscle release" },
-      { name: "Aroma Therapy Massage", price: 800, subtitle: "Essential oil spa blend" },
-      { name: "Premium Spa Massage", price: 1200, subtitle: "Full luxury treatment" }
+      { name: "Head Massage", price: 100, subtitle: "Quick stress relief", image: "https://img.freepik.com/free-photo/closeup-man-getting-head-massage-relaxing-with-eyes-closed-spa_637285-1721.jpg" },
+      { name: "Oil Head Massage", price: 150, subtitle: "Deep soothing scalp care", image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=600&q=80" },
+      { name: "Shoulder Massage", price: 120, subtitle: "Release upper-body tension", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnvDv3tjT3tBwzfzVyfNET1xnISthguufSOw&s" },
+      { name: "Full Body Massage", price: 600, subtitle: "Complete body relaxation", image: "https://glazma.com/static/media/glazma-men's-massage-salon.b325af681d8943a7aeb3.jpg" },
+      { name: "Foot Massage", price: 150, subtitle: "Rest and recovery for feet", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbZD6-fg56rtFWLh6Z9gGYHp0hMVRdRgLYbw&s" },
+      { name: "Neck Massage", price: 120, subtitle: "Ease tight neck muscles", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGiUJTIFEk5UoZG2BbZd7deyGAiJgwYwnqpA&s" },
+      { name: "Relaxation Massage", price: 400, subtitle: "Calming wellness session", image: "https://naturalspapune.com/wp-content/uploads/2023/07/Untitled-design-11-1024x768.png" },
+      { name: "Deep Tissue Massage", price: 700, subtitle: "Targeted muscle release", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVu2kUBSPAq7ydb2obOCjfRB6iQVxOac0nqA&s" },
+      { name: "Aroma Therapy Massage", price: 800, subtitle: "Essential oil spa blend", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu1QL6r9o6box8fCUcPy1Wu2Q1qYzvzOdDSg&s" },
+      { name: "Premium Spa Massage", price: 1200, subtitle: "Full luxury treatment", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQykBSWZBElBpvJgVrf-CvFWVm_u1E9b-dfmQ&s" }
     ]
   },
   {
     type: "Hair Spa",
     subtitle: "Nourishing spa care for softness, shine, and repair.",
     image:
-      "https://images.unsplash.com/photo-1522336572468-97b06e8ef143?auto=format&fit=crop&w=900&q=80",
+      "https://imgmediagumlet.lbb.in/media/2023/06/649c2d404a32d7701e70c4ea_1687956800644.jpg",
     items: [
-      { name: "Basic Hair Spa", price: 300, subtitle: "Simple refresh and care" },
-      { name: "Anti-Dandruff Spa", price: 400, subtitle: "Scalp comfort treatment" },
-      { name: "Hair Fall Control Spa", price: 450, subtitle: "Strengthening support" },
-      { name: "Protein Hair Spa", price: 500, subtitle: "Repair with protein care" },
-      { name: "Smoothening Spa", price: 600, subtitle: "Softer, smoother finish" },
-      { name: "Keratin Hair Spa", price: 700, subtitle: "Keratin smoothing care" },
-      { name: "Scalp Treatment Spa", price: 550, subtitle: "Healthy scalp restoration" },
-      { name: "Herbal Hair Spa", price: 450, subtitle: "Plant-based nourishment" },
-      { name: "Oil Therapy Spa", price: 350, subtitle: "Warm oil therapy care" },
-      { name: "Premium Hair Spa", price: 900, subtitle: "Luxury repair ritual" }
+      { name: "Basic Hair Spa", price: 300, subtitle: "Simple refresh and care", image: "https://i-media.vyaparify.com/vcards/blogs/129114/Glazma-Hair-spa.jpg" },
+      { name: "Anti-Dandruff Spa", price: 400, subtitle: "Scalp comfort treatment", image: "https://ghc.health/cdn/shop/articles/WhatsApp_Image_2021-10-14_at_10.59.55_AM_1.jpg?v=1634202112" },
+      { name: "Hair Fall Control Spa", price: 450, subtitle: "Strengthening support", image: "https://www.thriveco.in/cdn/shop/files/6_a0afcb6c-d5bf-452f-9ef2-5927a8157dc7_2.webp?v=1753424079&width=500" },
+      { name: "Protein Hair Spa", price: 500, subtitle: "Repair with protein care", image: "https://5.imimg.com/data5/SELLER/Default/2025/6/521341463/YP/XL/WZ/217165649/eye-lashes.jpeg" },
+      { name: "Smoothening Spa", price: 600, subtitle: "Softer, smoother finish", image: "https://content.jdmagicbox.com/comp/def_content/hair-spas-for-men/d686b07e69-hair-spas-for-men-4-eg0b8.jpg" },
+      { name: "Keratin Hair Spa", price: 700, subtitle: "Keratin smoothing care", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTauaU2RPVA3fB6kp3HYKs3XTNE7nui6PrtZQ&s" },
+      { name: "Scalp Treatment Spa", price: 550, subtitle: "Healthy scalp restoration", image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80" },
+      { name: "Herbal Hair Spa", price: 450, subtitle: "Plant-based nourishment", image: "https://herbsense.in/cdn/shop/files/new_hair_spa_image_2.jpg?v=1766837418&width=1946" },
+      { name: "Oil Therapy Spa", price: 350, subtitle: "Warm oil therapy care", image: "https://ghc.health/cdn/shop/articles/handsome-man-relaxing-spa_144627-2263.jpg?v=1622535973" },
+      { name: "Premium Hair Spa", price: 900, subtitle: "Luxury repair ritual", image: "https://assets.gqindia.com/photos/5dce7cc8836a7f0008bf47be/master/pass/Spas%20and%20salons%20for%20men%20in%20Mumbai.jpg" }
     ]
   },
   {
     type: "Face Mask",
     subtitle: "Fresh masks for glow, hydration, and skin clarity.",
     image:
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80",
+      "https://thumbs.dreamstime.com/b/mud-facial-mask-men-spa-salon-massage-clay-full-face-girl-therapy-room-man-lying-spa-bed-beautician-103315687.jpg",
     items: [
-      { name: "Basic Face Mask", price: 100, subtitle: "Simple skin refresh" },
-      { name: "Fruit Face Mask", price: 150, subtitle: "Vitamin-rich glow care" },
-      { name: "Charcoal Mask", price: 200, subtitle: "Deep pore cleansing" },
-      { name: "Gold Face Mask", price: 250, subtitle: "Radiance-focused treatment" },
-      { name: "Anti-Acne Mask", price: 180, subtitle: "Blemish support care" },
-      { name: "Hydrating Mask", price: 220, subtitle: "Moisture boost therapy" },
-      { name: "Herbal Mask", price: 200, subtitle: "Gentle natural care" },
-      { name: "Whitening Mask", price: 250, subtitle: "Brightness enhancement" },
-      { name: "Detan Mask", price: 300, subtitle: "Tan removal treatment" },
-      { name: "Premium Glow Mask", price: 400, subtitle: "Brighter luxury finish" }
+      { name: "Basic Face Mask", price: 100, subtitle: "Simple skin refresh", image: "https://cdn.credihealth.com/production/system/images/assets/79882/original/5-long-term-benefits-of-face-mask-for-men-3009.webp?1729078498" },
+      { name: "Fruit Face Mask", price: 150, subtitle: "Vitamin-rich glow care", image: "https://thumbs.dreamstime.com/b/facial-mask-fresh-fruits-man-beautician-apply-slices-clay-avocado-grapefruit-kiwi-male-lying-spa-bed-has-89945649.jpg" },
+      { name: "Charcoal Mask", price: 200, subtitle: "Deep pore cleansing", image: "https://prod-cdn.hook.online/images/original/2025/6/27/8-best-charcoal-face-masks-for-men-that-go-deep-detox-the-skin-1751022575862.jpg" },
+      { name: "Gold Face Mask", price: 250, subtitle: "Radiance-focused treatment", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTltmeahXZ00tNqhWAHoxSHlzb6rIYwg58qlw&s" },
+      { name: "Anti-Acne Mask", price: 180, subtitle: "Blemish support care", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQN_chtgy-g01JOqbtO4GxitGaPtljAqqzYJw&s" },
+      { name: "Hydrating Mask", price: 220, subtitle: "Moisture boost therapy", image: "https://cdn.shopify.com/s/files/1/1049/3064/files/face_masks_for_men_2_large.jpg?v=1553539023" },
+      { name: "Herbal Mask", price: 200, subtitle: "Gentle natural care", image: "https://cdn.shopify.com/s/files/1/2395/7673/files/MULTANI-MITTI-MEN-FACE-PACK-2_480x480.jpg?v=1657540679" },
+      { name: "Whitening Mask", price: 250, subtitle: "Brightness enhancement", image: "https://static.wixstatic.com/media/c508e3_21f2a99209234f0caa3709dae2124da7~mv2.jpg/v1/fill/w_1000,h_750,al_c,q_85,usm_0.66_1.00_0.01/c508e3_21f2a99209234f0caa3709dae2124da7~mv2.jpg" },
+      { name: "Detan Mask", price: 300, subtitle: "Tan removal treatment", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGhPL1k5NUOksjBaYR7tmPhsFN0gRmPUW2sQ&s" },
+      { name: "Premium Glow Mask", price: 400, subtitle: "Brighter luxury finish", image: "https://www.particleformen.com/wp-content/uploads/2020/02/bd9ddbf3e74fbc475cf5be593b2f1b099015f220-1-scaled.jpg" }
     ]
   },
   {
     type: "Hair Color",
     subtitle: "Color services from subtle root touch-ups to bold fashion shades.",
     image:
-      "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=900&q=80",
+      "https://static.wixstatic.com/media/c508e3_ea171fcc84ee4fb8aabacd7e0ae7c27f~mv2.jpg/v1/fill/w_1000,h_667,al_c,q_85,usm_0.66_1.00_0.01/c508e3_ea171fcc84ee4fb8aabacd7e0ae7c27f~mv2.jpg",
     items: [
-      { name: "Root Touch-Up", price: 300, subtitle: "Freshen the roots" },
-      { name: "Global Hair Color", price: 800, subtitle: "All-over color change" },
-      { name: "Highlights", price: 700, subtitle: "Light-catching strands" },
-      { name: "Lowlights", price: 700, subtitle: "Soft depth and contrast" },
-      { name: "Beard Color", price: 250, subtitle: "Blend beard tones" },
-      { name: "Ammonia-Free Color", price: 900, subtitle: "Gentler color option" },
-      { name: "Fashion Color", price: 1200, subtitle: "Creative bold shade" },
-      { name: "Streak Coloring", price: 500, subtitle: "Accent color streaks" },
-      { name: "Temporary Color", price: 300, subtitle: "Short-term color trial" },
-      { name: "Premium Hair Color", price: 1500, subtitle: "Signature color service" }
+      { name: "Root Touch-Up", price: 300, subtitle: "Freshen the roots", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWwldqfKC_bL-WI5WjvMZmqB5fLyYFqV-yKg&s" },
+      { name: "Global Hair Color", price: 800, subtitle: "All-over color change", image: "https://alurabeautysalon.com/wp-content/uploads/2021/07/Global-Hair-ColourMale.jpg" },
+      { name: "Highlights", price: 700, subtitle: "Light-catching strands", image: "https://www.newtimeshair.com/wp-content/uploads/2024/10/3-platinum-rebel.jpg" },
+      { name: "Lowlights", price: 700, subtitle: "Soft depth and contrast", image: "https://i.pinimg.com/originals/e8/ee/21/e8ee21ac1d134ca51526263f92800926.jpg" },
+      { name: "Beard Color", price: 250, subtitle: "Blend beard tones", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy0XXK7d0FwQuv6PNuvPPY2rvjf2aWBdTVvw&s" },
+      { name: "Ammonia-Free Color", price: 900, subtitle: "Gentler color option", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJmbCprQ0QHL8sFjeE35gEr6RVAMjZEMe8mg&s" },
+      { name: "Fashion Color", price: 1200, subtitle: "Creative bold shade", image: "https://i.pinimg.com/474x/a0/e6/1e/a0e61e45069c9fbd807b14c53ae63451.jpg" },
+      { name: "Streak Coloring", price: 500, subtitle: "Accent color streaks", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR437icem87_gtAKvYV5KQ8p0ZibnJPrK83Uw&s" },
+      { name: "Temporary Color", price: 300, subtitle: "Short-term color trial", image: "https://i.pinimg.com/736x/6a/93/4a/6a934a8bedbc54a66dae4b1de4778b26.jpg" },
+      { name: "Premium Hair Color", price: 1500, subtitle: "Signature color service", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZHC85nwRTy_8fporKOJP0jIjAp9SU9l-_Ug&s" }
     ]
   },
   {
     type: "Facial",
     subtitle: "Facials for skin polish, glow, and advanced care.",
     image:
-      "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=900&q=80",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfIDNEvsDTu_Frf5M1wCgypxS7mvBcnEufBw&s",
     items: [
-      { name: "Basic Facial", price: 300, subtitle: "Simple cleansing facial" },
-      { name: "Fruit Facial", price: 400, subtitle: "Fresh fruit-infused care" },
-      { name: "Gold Facial", price: 600, subtitle: "Glow and premium finish" },
-      { name: "Diamond Facial", price: 800, subtitle: "Brightening luxury facial" },
-      { name: "Anti-Aging Facial", price: 900, subtitle: "Firming skin support" },
-      { name: "Acne Treatment Facial", price: 700, subtitle: "Acne-focused treatment" },
-      { name: "Whitening Facial", price: 750, subtitle: "Tone and radiance boost" },
-      { name: "Herbal Facial", price: 500, subtitle: "Gentle botanical care" },
-      { name: "Detan Facial", price: 650, subtitle: "Sun tan recovery facial" },
-      { name: "Premium Luxury Facial", price: 1200, subtitle: "High-end spa facial" }
+      { name: "Oxygen Facial", price: 300, subtitle: "Simple cleansing facial", image: "https://novoskin.life/wp-content/uploads/2025/03/Cosmetic-Clinic-Novoskin-Services-Face-Clinic-treatment-Oxygeneo-3-in-1-Super-Facial-BODY-TREATMENTS-WITH-OXYGENEO-Toronto-Ontario-Canada-1.webp" },
+      { name: "Collagen Facial", price: 400, subtitle: "Fresh fruit-infused care", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAIJ3edgok2k0GeWGs5gxzLTgj8stwbRHKUA&s" },
+      { name: "Gold Facial", price: 600, subtitle: "Glow and premium finish", image: "https://vanessamarc.com/cdn/shop/files/Men_s24KGoldFacial_1000x.png?v=1741556497" },
+      { name: "Vitamin C Facial", price: 800, subtitle: "Brightening luxury facial", image: "https://mxp-media.ilnmedia.com/media/content/2022/Sep/how-to-use-vitamin-c-serum-on-your-face-amp-image_6315f24e6a0b7.jpeg" },
+      { name: "Chemical Peel Facial", price: 900, subtitle: "Firming skin support", image: "https://healthcarpenter.com/storage/2025/01/Chemical-Peels-in-Orlando-FL-by-The-Health-Carpenter.webp" },
+      { name: "Hydrafacial", price: 700, subtitle: "Acne-focused treatment", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyFZI7uqpSq2sCmzs79sYSodzA2seqNrro1g&s" },
+      { name: "LED Light Therapy Facial", price: 750, subtitle: "Tone and radiance boost", image: "https://img.lb.wbmdstatic.com/vim/live/webmd/consumer_assets/site_images/article_thumbnails/blog_posts/psoriasis/woman-receiving-red-light-therapy-on-face/1800x1200-woman-receiving-red-light-therapy-on-face.jpg" },
+      { name: "Herbal Facial", price: 500, subtitle: "Gentle botanical care", image: "https://www.yesmadam.com/blog/wp-content/uploads/Homemade-Facial-for-Men-3.jpg" },
+      { name: "Pearl Facial", price: 650, subtitle: "Sun tan recovery facial", image: "https://m.media-amazon.com/images/I/61G2np2p-qL.jpg" },
+      { name: "Skin Detox Facial", price: 1200, subtitle: "High-end spa facial", image: "https://static.vecteezy.com/system/resources/previews/069/594/645/non_2x/refreshing-facial-treatment-session-for-skin-rejuvenation-with-soft-face-mask-application-free-photo.jpeg" }
     ]
   }
 ];
+
+const serviceImageGroups = {
+  "Hair Cut": [
+    "https://images.unsplash.com/photo-1606333259737-6da197890fa2?w=600&auto=format&fit=crop&q=60",
+    "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1522336572468-97b06e8ef143?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1527799820374-36f3f9f5a1c0?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80"
+  ],
+  Beard: [
+    "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1527799820374-36f3f9f5a1c0?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1522336572468-97b06e8ef143?auto=format&fit=crop&w=600&q=80"
+  ],
+  Massage: [
+    "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1522336572468-97b06e8ef143?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1527799820374-36f3f9f5a1c0?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80"
+  ],
+  "Hair Spa": [
+    "https://images.unsplash.com/photo-1522336572468-97b06e8ef143?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1527799820374-36f3f9f5a1c0?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80"
+  ],
+  "Face Mask": [
+    "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1527799820374-36f3f9f5a1c0?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1522336572468-97b06e8ef143?auto=format&fit=crop&w=600&q=80"
+  ],
+  "Hair Color": [
+    "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1527799820374-36f3f9f5a1c0?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1522336572468-97b06e8ef143?auto=format&fit=crop&w=600&q=80"
+  ],
+  Facial: [
+    "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1527799820374-36f3f9f5a1c0?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1522336572468-97b06e8ef143?auto=format&fit=crop&w=600&q=80"
+  ]
+};
+
+const serviceCatalog = serviceCatalogBase.map((category) => ({
+  ...category,
+  image: category.image || serviceImageGroups[category.type]?.[0] || "",
+  items: category.items.map((item, index) => ({
+    ...item,
+    image:
+      item.image ||
+      serviceImageGroups[category.type]?.[index] ||
+      category.image ||
+      salonGalleryImages[index % salonGalleryImages.length]
+  }))
+}));
 
 const timeSlots = [
   "09:00 AM",
@@ -216,7 +315,7 @@ function CustomerDashboard() {
   const currentCategory = serviceCatalog.find((item) => item.type === selectedType) || serviceCatalog[0];
   const displayedService = currentCategory.items.find((item) => item.name === selectedService?.name) || currentCategory.items[0];
   const currentCategoryIndex = serviceCatalog.findIndex((item) => item.type === currentCategory.type);
-  const previewImage = getSalonImage(currentCategoryIndex);
+  const previewImage = currentCategory.image || getSalonImage(currentCategoryIndex);
   const total = cart.reduce((sum, item) => sum + Number(item.price || 0), 0);
   const minimumDate = new Date().toISOString().split("T")[0];
 
@@ -583,7 +682,7 @@ function CustomerDashboard() {
                       <Typography sx={{ color: "#f59e0b", fontSize: 12, letterSpacing: 2, textTransform: "uppercase" }}>
                         Featured Service
                       </Typography>
-                      <Typography sx={{ fontSize: 28, fontWeight: 900, mt: 0.5 }}>
+                      <Typography sx={{ fontSize: 28, fontWeight: 900, mt: 0.5, color: "#ffffff" }}>
                         {displayedService.name}
                       </Typography>
                       <Typography sx={{ color: "rgba(248,250,252,0.78)", mt: 1, lineHeight: 1.8 }}>
@@ -728,7 +827,19 @@ function CustomerDashboard() {
                             >
                               <Box
                                 component="img"
-                                src={getSalonImage(serviceCatalog.findIndex((entry) => entry.type === currentCategory.type) + currentCategory.items.findIndex((entry) => entry.name === item.name) + 1)}
+                                src={
+                                  item.image ||
+                                  currentCategory.image ||
+                                  getSalonImage(
+                                    serviceCatalog.findIndex(
+                                      (entry) => entry.type === currentCategory.type
+                                    ) +
+                                      currentCategory.items.findIndex(
+                                        (entry) => entry.name === item.name
+                                      ) +
+                                      1
+                                  )
+                                }
                                 alt={item.name}
                                 sx={{
                                   width: 92,
