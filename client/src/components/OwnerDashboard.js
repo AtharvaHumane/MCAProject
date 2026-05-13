@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -22,11 +22,6 @@ import {
   ListItemText,
   Paper,
   Snackbar,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   TextField,
   Typography
 } from "@mui/material";
@@ -34,9 +29,6 @@ import {
 import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import PeopleAltRoundedIcon from "@mui/icons-material/PeopleAltRounded";
 import ContentCutRoundedIcon from "@mui/icons-material/ContentCutRounded";
-import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
-import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
-import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
@@ -44,16 +36,7 @@ import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded
 import CurrencyRupeeRoundedIcon from "@mui/icons-material/CurrencyRupeeRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts";
-
 const sidebarWidth = 250;
-const chartColors = ["#14b8a6", "#ff7a6b", "#4f7cf7", "#fbbf24", "#a78bfa"];
 
 function OwnerDashboard() {
   const navigate = useNavigate();
@@ -111,41 +94,12 @@ function OwnerDashboard() {
     }
   };
 
-  const accept = async (id) => {
-    try {
-      await axios.put(`${apiBaseUrl}/bookings/accept/${id}`);
-      showSnackbar("Booking accepted");
-      fetchBookings();
-    } catch (error) {
-      console.error("Failed to accept booking:", error);
-      showSnackbar(
-        error.response?.data?.message || "Could not accept booking right now.",
-        "error"
-      );
-    }
-  };
-
-  const reject = async (id) => {
-    try {
-      await axios.put(`${apiBaseUrl}/bookings/reject/${id}`);
-      showSnackbar("Booking rejected");
-      fetchBookings();
-    } catch (error) {
-      console.error("Failed to reject booking:", error);
-      showSnackbar(
-        error.response?.data?.message || "Could not reject booking right now.",
-        "error"
-      );
-    }
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
   };
 
-  const todayDate = new Date().toISOString().slice(0, 10);
-  const todayBookings = bookings.filter((booking) => booking.date === todayDate);
+  const todayBookings = bookings.filter((booking) => booking.date === new Date().toISOString().slice(0, 10));
   const acceptedBookings = bookings.filter((booking) => booking.status === "accepted");
   const pendingBookings = bookings.filter((booking) => booking.status === "pending");
   const rejectedBookings = bookings.filter((booking) => booking.status === "rejected");
@@ -171,24 +125,36 @@ function OwnerDashboard() {
     0
   );
 
-  const serviceStatsMap = bookings.reduce((acc, booking) => {
-    (booking.services || []).forEach((item) => {
-      const existing = acc[item.name] || { name: item.name, value: 0, revenue: 0 };
-      existing.value += 1;
-      existing.revenue += Number(item.price || 0);
-      acc[item.name] = existing;
-    });
-
-    return acc;
-  }, {});
-
-  const serviceChartData = Object.values(serviceStatsMap);
   const completionRate = bookings.length
     ? Math.round((acceptedBookings.length / bookings.length) * 100)
     : 0;
   const averageRevenue = acceptedBookings.length
     ? Math.round(totalRevenue / acceptedBookings.length)
     : 0;
+
+  const earningsTrend = useMemo(() => {
+    const trend = [];
+    const today = new Date();
+
+    for (let offset = 6; offset >= 0; offset -= 1) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - offset);
+
+      const dateKey = date.toISOString().slice(0, 10);
+      const value = bookings
+        .filter((booking) => booking.date === dateKey && booking.status === "accepted")
+        .reduce((sum, booking) => sum + getBookingRevenue(booking), 0);
+
+      trend.push({
+        label: date.toLocaleDateString("en-IN", { weekday: "short" }),
+        value
+      });
+    }
+
+    return trend;
+  }, [bookings]);
+
+  const peakTrendValue = Math.max(...earningsTrend.map((item) => item.value), 1);
 
   const statCards = [
     {
@@ -223,14 +189,9 @@ function OwnerDashboard() {
 
   const sidebarItems = [
     { label: "Dashboard", icon: <DashboardRoundedIcon />, active: true, onClick: () => navigate("/dashboard") },
-    { label: "Appointments", icon: <EventAvailableRoundedIcon />, onClick: () => navigate("/dashboard") },
+    { label: "Appointments", icon: <EventAvailableRoundedIcon />, onClick: () => navigate("/appointments") },
     { label: "Customers", icon: <PeopleAltRoundedIcon />, onClick: () => navigate("/customers") },
     { label: "Services", icon: <ContentCutRoundedIcon />, onClick: () => navigate("/services") }
-  ];
-
-  const secondaryItems = [
-    { label: "Help", icon: <HelpOutlineRoundedIcon /> },
-    { label: "Settings", icon: <SettingsRoundedIcon /> }
   ];
 
   const formatDateLabel = () => {
@@ -240,28 +201,6 @@ function OwnerDashboard() {
       month: "short",
       year: "numeric"
     });
-  };
-
-  const renderStatusChip = (status) => {
-    const styles = {
-      pending: { bg: "rgba(251,191,36,0.16)", color: "#a16207", label: "Pending" },
-      accepted: { bg: "rgba(16,185,129,0.16)", color: "#047857", label: "Accepted" },
-      rejected: { bg: "rgba(248,113,113,0.16)", color: "#b91c1c", label: "Rejected" }
-    };
-
-    const selected = styles[status] || styles.pending;
-
-    return (
-      <Chip
-        label={selected.label}
-        size="small"
-        sx={{
-          background: selected.bg,
-          color: selected.color,
-          fontWeight: 700
-        }}
-      />
-    );
   };
 
   return (
@@ -293,14 +232,15 @@ function OwnerDashboard() {
                 height: 36,
                 borderRadius: 1.5,
                 border: "2px solid #d6b98c",
-                color: "#d6b98c",
+                backgroundColor: "#111827",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontWeight: 800
+                overflow: "hidden",
+                flexShrink: 0
               }}
             >
-              H
+              <Box component="img" src="/hairsalon-icon-192.png" alt="HairSalon logo" sx={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </Box>
             <Typography sx={{ fontSize: 16, fontWeight: 700, color: "#d1d5db" }}>
               HairSalon
@@ -330,30 +270,6 @@ function OwnerDashboard() {
               </ListItemButton>
             ))}
           </List>
-
-          <Box sx={{ mt: 5 }}>
-            <List sx={{ gap: 0.5, display: "grid" }}>
-              {secondaryItems.map((item) => (
-                <ListItemButton
-                  key={item.label}
-                  sx={{
-                    borderRadius: 2,
-                    px: 1.5,
-                    py: 1.1,
-                    color: "#d1d5db",
-                    "&:hover": {
-                      background: "rgba(255,255,255,0.05)"
-                    }
-                  }}
-                >
-                  <ListItemIcon sx={{ color: "inherit", minWidth: 38 }}>
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText primary={item.label} />
-                </ListItemButton>
-              ))}
-            </List>
-          </Box>
 
           <Box sx={{ mt: "auto", pt: 4, pb: 2 }}>
             <Divider sx={{ borderColor: "rgba(255,255,255,0.12)", mb: 2 }} />
@@ -398,8 +314,8 @@ function OwnerDashboard() {
       </Drawer>
 
       <Box sx={{ flex: 1, p: { xs: 2, md: 4 } }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} xl={8}>
+        <Grid container spacing={2.25}>
+          <Grid item xs={12} lg={7}>
             <Typography sx={{ fontSize: 16, color: "#64748b", mb: 0.5 }}>
               {formatDateLabel()}
             </Typography>
@@ -508,255 +424,136 @@ function OwnerDashboard() {
               </Box>
             </Paper>
 
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
-              <Typography sx={{ fontSize: 16, fontWeight: 800, color: "#475569" }}>
-                Pending and scheduled bookings
-              </Typography>
-              <Button
-                startIcon={<AddRoundedIcon />}
-                variant="contained"
-                onClick={() => setOpen(true)}
-                sx={{
-                  borderRadius: 999,
-                  textTransform: "none",
-                  fontWeight: 700,
-                  background: "#d6b98c",
-                  color: "#111827",
-                  "&:hover": {
-                    background: "#c9ab7a"
-                  }
-                }}
-              >
-                Add service
-              </Button>
-            </Box>
-
-            <Paper
-              elevation={0}
-              sx={{
-                borderRadius: 3,
-                overflow: "hidden",
-                border: "1px solid #edf2f7",
-                boxShadow: "0 12px 30px rgba(148,163,184,0.08)"
-              }}
-            >
-              <Table>
-                <TableHead sx={{ background: "#f8fafc" }}>
-                  <TableRow>
-                    <TableCell>Time</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell>Service name</TableCell>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell align="right">Price</TableCell>
-                    <TableCell align="right">Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {(todayBookings.length ? todayBookings : bookings).map((booking) => (
-                    <TableRow key={booking._id} hover>
-                      <TableCell sx={{ color: "#64748b", fontWeight: 700 }}>
-                        {booking.time || "--"}
-                      </TableCell>
-                      <TableCell sx={{ color: "#475569" }}>
-                        {booking.customerName || booking.customer}
-                      </TableCell>
-                      <TableCell sx={{ color: "#64748b" }}>
-                        {(booking.services || []).map((item) => item.name).join(", ") || "--"}
-                      </TableCell>
-                      <TableCell sx={{ color: "#64748b" }}>
-                        {booking.date || "--"}
-                      </TableCell>
-                      <TableCell>{renderStatusChip(booking.status)}</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 700, color: "#475569" }}>
-                        ₹{getBookingRevenue(booking)}
-                      </TableCell>
-                      <TableCell align="right">
-                        {booking.status === "pending" ? (
-                          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
-                            <Button
-                              size="small"
-                              onClick={() => accept(booking._id)}
-                              sx={{
-                                borderRadius: 999,
-                                minWidth: 80,
-                                textTransform: "none",
-                                color: "#059669",
-                                background: "rgba(16,185,129,0.12)"
-                              }}
-                            >
-                              Accept
-                            </Button>
-                            <Button
-                              size="small"
-                              onClick={() => reject(booking._id)}
-                              sx={{
-                                borderRadius: 999,
-                                minWidth: 80,
-                                textTransform: "none",
-                                color: "#dc2626",
-                                background: "rgba(248,113,113,0.14)"
-                              }}
-                            >
-                              Reject
-                            </Button>
-                          </Box>
-                        ) : (
-                          <Typography sx={{ color: "#94a3b8", fontSize: 13 }}>
-                            No action
-                          </Typography>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-
-                  {!bookings.length && (
-                    <TableRow>
-                      <TableCell colSpan={7} align="center" sx={{ py: 5, color: "#94a3b8" }}>
-                        No bookings available yet.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </Paper>
           </Grid>
 
-          <Grid item xs={12} xl={4}>
+          <Grid item xs={12} lg={5}>
             <Typography sx={{ fontSize: 16, fontWeight: 800, color: "#475569", mb: 1.5 }}>
-              Appts and Revenue
-            </Typography>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                background: "#fff",
-                border: "1px solid #edf2f7",
-                boxShadow: "0 12px 30px rgba(148,163,184,0.08)",
-                mb: 3
-              }}
-            >
-              <Box sx={{ height: 260 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={serviceChartData.length ? serviceChartData : [{ name: "No data", value: 1, revenue: 0 }]}
-                      dataKey="value"
-                      innerRadius={62}
-                      outerRadius={98}
-                      stroke="none"
-                    >
-                      {(serviceChartData.length ? serviceChartData : [{ name: "No data", value: 1 }]).map((entry, index) => (
-                        <Cell
-                          key={entry.name || index}
-                          fill={chartColors[index % chartColors.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </Box>
-
-              <Box sx={{ mt: -16, textAlign: "center", pointerEvents: "none" }}>
-                <Typography sx={{ fontSize: 28, fontWeight: 800, color: "#334155" }}>
-                  ₹{totalRevenue}
-                </Typography>
-                <Typography sx={{ color: "#64748b" }}>Total</Typography>
-              </Box>
-
-              <Box sx={{ mt: 8 }}>
-                {(serviceChartData.length ? serviceChartData : []).map((item, index) => (
-                  <Box
-                    key={item.name}
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns: "24px 1fr auto",
-                      gap: 1.5,
-                      alignItems: "center",
-                      py: 0.8
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 18,
-                        height: 8,
-                        borderRadius: 999,
-                        background: chartColors[index % chartColors.length]
-                      }}
-                    />
-                    <Typography sx={{ color: "#64748b" }}>{item.name}</Typography>
-                    <Typography sx={{ color: "#475569", fontWeight: 700 }}>
-                      ₹{item.revenue}
-                    </Typography>
-                  </Box>
-                ))}
-
-                {!serviceChartData.length && (
-                  <Typography sx={{ color: "#94a3b8", textAlign: "center", py: 2 }}>
-                    Service chart will appear after bookings are added.
-                  </Typography>
-                )}
-              </Box>
-            </Paper>
-
-            <Typography sx={{ fontSize: 16, fontWeight: 800, color: "#475569", mb: 1.5 }}>
-              Week overview
+              Earnings overview
             </Typography>
             <Paper
               elevation={0}
               sx={{
                 p: 2.5,
                 borderRadius: 3,
-                background: "#fff",
+                background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
                 border: "1px solid #edf2f7",
-                boxShadow: "0 12px 30px rgba(148,163,184,0.08)"
+                boxShadow: "0 12px 30px rgba(148,163,184,0.08)",
+                mb: 3
               }}
             >
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => {
-                const sampleCount = bookings.length
-                  ? bookings.filter((booking) => new Date(booking.date || todayDate).getDay() === ((index + 1) % 7)).length
-                  : 0;
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
+                <Box>
+                  <Typography sx={{ fontSize: 13, color: "#64748b", mb: 0.4 }}>
+                    Total earnings
+                  </Typography>
+                  <Typography sx={{ fontSize: 30, fontWeight: 900, color: "#0f172a", lineHeight: 1.1 }}>
+                    ₹{totalRevenue}
+                  </Typography>
+                </Box>
+                <Chip
+                  label={`${completionRate}% completion`}
+                  size="small"
+                  sx={{
+                    background: "rgba(16,185,129,0.12)",
+                    color: "#047857",
+                    fontWeight: 700
+                  }}
+                />
+              </Box>
 
-                return (
+              <Grid container spacing={1.2} sx={{ mb: 2 }}>
+                <Grid item xs={6}>
                   <Box
-                    key={day}
                     sx={{
-                      display: "grid",
-                      gridTemplateColumns: "56px 1fr auto",
-                      alignItems: "center",
-                      gap: 1.5,
-                      py: 1.15
+                      p: 1.5,
+                      borderRadius: 2.5,
+                      background: "rgba(249,115,22,0.08)",
+                      border: "1px solid rgba(249,115,22,0.12)"
                     }}
                   >
-                    <Typography sx={{ color: "#64748b", fontWeight: 700 }}>
-                      {day}
-                    </Typography>
-                    <Box
-                      sx={{
-                        height: 10,
-                        borderRadius: 999,
-                        background: "#eef2ff",
-                        overflow: "hidden"
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: `${Math.min(sampleCount * 22, 100)}%`,
-                          height: "100%",
-                          borderRadius: 999,
-                          background:
-                            index % 3 === 0 ? "#8b5cf6" : index % 3 === 1 ? "#f97316" : "#3b82f6"
-                        }}
-                      />
-                    </Box>
-                    <Typography sx={{ color: "#94a3b8", fontSize: 13 }}>
-                      {sampleCount}
+                    <Typography sx={{ fontSize: 12, color: "#9a3412" }}>Today</Typography>
+                    <Typography sx={{ fontSize: 18, fontWeight: 900, color: "#7c2d12" }}>
+                      ₹{todayRevenue}
                     </Typography>
                   </Box>
-                );
-              })}
+                </Grid>
+                <Grid item xs={6}>
+                  <Box
+                    sx={{
+                      p: 1.5,
+                      borderRadius: 2.5,
+                      background: "rgba(59,130,246,0.08)",
+                      border: "1px solid rgba(59,130,246,0.12)"
+                    }}
+                  >
+                    <Typography sx={{ fontSize: 12, color: "#1d4ed8" }}>Average</Typography>
+                    <Typography sx={{ fontSize: 18, fontWeight: 900, color: "#1e3a8a" }}>
+                      ₹{averageRevenue}
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+
+              <Box
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2.5,
+                  background: "#f8fafc",
+                  border: "1px solid #e2e8f0"
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "flex-end", gap: 1, height: 170 }}>
+                  {earningsTrend.map((item) => {
+                    const barHeight = `${Math.max((item.value / peakTrendValue) * 100, item.value ? 16 : 8)}%`;
+
+                    return (
+                      <Box key={item.label} sx={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 0.8 }}>
+                        <Box
+                          sx={{
+                            width: "100%",
+                            maxWidth: 34,
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "flex-end",
+                            justifyContent: "center"
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: "68%",
+                              minHeight: item.value ? 18 : 8,
+                              height: barHeight,
+                              borderRadius: 999,
+                              background: item.value
+                                ? "linear-gradient(180deg, #f97316 0%, #fb923c 100%)"
+                                : "#dbe4f0",
+                              boxShadow: item.value ? "0 10px 20px rgba(249,115,22,0.22)" : "none"
+                            }}
+                          />
+                        </Box>
+                        <Typography sx={{ fontSize: 11, color: "#64748b", fontWeight: 700 }}>
+                          {item.label}
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </Box>
+
+              <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 1.2, mt: 2 }}>
+                <Box sx={{ p: 1.5, borderRadius: 2.5, background: "#fff7ed", border: "1px solid #fed7aa" }}>
+                  <Typography sx={{ fontSize: 12, color: "#9a3412" }}>Bookings</Typography>
+                  <Typography sx={{ fontSize: 18, fontWeight: 900, color: "#7c2d12" }}>
+                    {bookings.length}
+                  </Typography>
+                </Box>
+                <Box sx={{ p: 1.5, borderRadius: 2.5, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+                  <Typography sx={{ fontSize: 12, color: "#1d4ed8" }}>Accepted</Typography>
+                  <Typography sx={{ fontSize: 18, fontWeight: 900, color: "#1e3a8a" }}>
+                    {acceptedBookings.length}
+                  </Typography>
+                </Box>
+              </Box>
             </Paper>
           </Grid>
         </Grid>
@@ -806,3 +603,4 @@ function OwnerDashboard() {
 }
 
 export default OwnerDashboard;
+
