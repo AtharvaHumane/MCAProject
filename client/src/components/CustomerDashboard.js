@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import {
   Alert,
@@ -26,6 +27,9 @@ import {
   TextField,
   Typography
 } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import AddShoppingCartRoundedIcon from "@mui/icons-material/AddShoppingCartRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
@@ -281,26 +285,21 @@ const serviceCatalog = serviceCatalogBase.map((category) => ({
   }))
 }));
 
-const timeSlots = [
-  "09:00 AM",
-  "10:00 AM",
-  "11:00 AM",
-  "12:00 PM",
-  "01:00 PM",
-  "02:00 PM",
-  "03:00 PM",
-  "04:00 PM",
-  "05:00 PM",
-  "06:00 PM",
-  "07:00 PM",
-  "08:00 PM"
-];
+const toBookingDate = (value) => {
+  if (!value || typeof value.format !== "function") {
+    return { date: "", time: "" };
+  }
+
+  return {
+    date: value.format("YYYY-MM-DD"),
+    time: value.format("hh:mm A")
+  };
+};
 
 function CustomerDashboard() {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+  const [bookingDateTime, setBookingDateTime] = useState(null);
   const [owners, setOwners] = useState([]);
   const [ownerId, setOwnerId] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
@@ -308,6 +307,7 @@ function CustomerDashboard() {
   const [selectedType, setSelectedType] = useState(serviceCatalog[0].type);
   const [selectedService, setSelectedService] = useState(serviceCatalog[0].items[0]);
   const [cartReady, setCartReady] = useState(false);
+  const [bookingPickerOpen, setBookingPickerOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const user = JSON.parse(localStorage.getItem("user"));
@@ -317,7 +317,7 @@ function CustomerDashboard() {
   const currentCategoryIndex = serviceCatalog.findIndex((item) => item.type === currentCategory.type);
   const previewImage = currentCategory.image || getSalonImage(currentCategoryIndex);
   const total = cart.reduce((sum, item) => sum + Number(item.price || 0), 0);
-  const minimumDate = new Date().toISOString().split("T")[0];
+  const minimumDateTime = dayjs().startOf("hour");
 
   useEffect(() => {
     const loadSavedCart = async () => {
@@ -422,18 +422,20 @@ function CustomerDashboard() {
       return;
     }
 
-    if (!date) {
-      showSnackbar("Please select a booking date.", "error");
-      return;
-    }
-
-    if (!time) {
-      showSnackbar("Please select a time slot.", "error");
+    if (!bookingDateTime) {
+      showSnackbar("Please select a booking date and time.", "error");
       return;
     }
 
     if (!cart.length) {
       showSnackbar("Please add at least one service to your cart.", "error");
+      return;
+    }
+
+    const { date, time } = toBookingDate(bookingDateTime);
+
+    if (!date || !time) {
+      showSnackbar("Please select a valid booking date and time.", "error");
       return;
     }
 
@@ -449,8 +451,7 @@ function CustomerDashboard() {
       });
 
       setCart([]);
-      setDate("");
-      setTime("");
+      setBookingDateTime(null);
       setCartOpen(false);
       showSnackbar("Appointment booked successfully.");
     } catch (error) {
@@ -493,7 +494,7 @@ function CustomerDashboard() {
     }
 
     if (action === "bookings") {
-      showSnackbar("Your bookings view is coming soon.");
+      navigate("/my-bookings");
       return;
     }
 
@@ -1005,81 +1006,141 @@ function CustomerDashboard() {
             ))}
           </TextField>
 
-          <Grid container spacing={2} sx={{ mb: 2 }}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Booking date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                inputProps={{ min: minimumDate }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    background: "rgba(255,255,255,0.05)",
-                    color: "#f8fafc",
-                    borderRadius: 2,
-                    "& fieldset": {
-                      borderColor: "rgba(255,255,255,0.15)"
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "rgba(251,191,36,0.5)"
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#fbbf24"
-                    }
-                  },
-                  "& .MuiInputLabel-root": {
-                    color: "rgba(248,250,252,0.72)"
-                  },
-                  "& .MuiInputLabel-root.Mui-focused": {
-                    color: "#fbbf24"
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DateTimePicker
+              label="Booking date and time"
+              value={bookingDateTime}
+              onChange={(value) => setBookingDateTime(value)}
+              open={bookingPickerOpen}
+              onOpen={() => setBookingPickerOpen(true)}
+              onClose={() => setBookingPickerOpen(false)}
+              minDateTime={minimumDateTime}
+              format="MM/DD/YYYY hh:mm A"
+              ampm
+              slotProps={{
+                popper: {
+                  sx: {
+                    zIndex: 1600
                   }
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                fullWidth
-                label="Time slot"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    background: "rgba(255,255,255,0.05)",
+                },
+                desktopPaper: {
+                  sx: {
+                    background: "linear-gradient(180deg, rgba(17,24,39,0.98), rgba(9,9,11,0.98))",
                     color: "#f8fafc",
-                    borderRadius: 2,
-                    "& fieldset": {
-                      borderColor: "rgba(255,255,255,0.15)"
+                    border: "1px solid rgba(251,191,36,0.18)",
+                    boxShadow: "0 24px 60px rgba(0,0,0,0.45)",
+                    "& .MuiTypography-root": {
+                      color: "#f8fafc"
                     },
-                    "&:hover fieldset": {
-                      borderColor: "rgba(251,191,36,0.5)"
+                    "& .MuiPickersCalendarHeader-label": {
+                      color: "#f8fafc"
                     },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#fbbf24"
+                    "& .MuiPickersArrowSwitcher-button": {
+                      color: "#f8fafc"
+                    },
+                    "& .MuiDayCalendar-weekDayLabel": {
+                      color: "rgba(248,250,252,0.72)"
+                    },
+                    "& .MuiPickersDay-root": {
+                      color: "#f8fafc"
+                    },
+                    "& .MuiPickersDay-root.Mui-disabled, & .MuiClockNumber-root.Mui-disabled, & .MuiMultiSectionDigitalClockSection-item.Mui-disabled, & .MuiDigitalClockItem-root.Mui-disabled": {
+                      color: "rgba(248,250,252,0.68)",
+                      WebkitTextFillColor: "rgba(248,250,252,0.68)",
+                      opacity: 1
+                    },
+                    "& .MuiPickersDay-root:not(.Mui-selected):not(.Mui-disabled)": {
+                      borderColor: "rgba(255,255,255,0.08)"
+                    },
+                    "& .MuiPickersDay-root.Mui-selected": {
+                      background: "linear-gradient(135deg, #f97316, #fbbf24)",
+                      color: "#111827"
+                    },
+                    "& .MuiClock-root, & .MuiDigitalClock-root": {
+                      background: "transparent",
+                      color: "#f8fafc"
+                    },
+                    "& .MuiClockNumber-root, & .MuiMultiSectionDigitalClockSection-item, & .MuiDigitalClockItem-root": {
+                      color: "#f8fafc"
+                    },
+                    "& .MuiTimeClock-root, & .MuiDigitalClockItem-root.Mui-selected": {
+                      background: "rgba(251,191,36,0.18)",
+                      color: "#fbbf24"
                     }
-                  },
-                  "& .MuiInputLabel-root": {
-                    color: "rgba(248,250,252,0.72)"
-                  },
-                  "& .MuiInputLabel-root.Mui-focused": {
-                    color: "#fbbf24"
-                  },
-                  "& .MuiSelect-icon": {
-                    color: "#f8fafc"
                   }
-                }}
-              >
-                {timeSlots.map((slot) => (
-                  <MenuItem key={slot} value={slot}>
-                    {slot}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
+                },
+                textField: {
+                  fullWidth: true,
+                  onClick: () => setBookingPickerOpen(true),
+                  onFocus: () => setBookingPickerOpen(true),
+                  sx: {
+                    mb: 2,
+                    color: "#f8fafc",
+                    "& *": {
+                      color: "#f8fafc"
+                    },
+                    "& .MuiOutlinedInput-root": {
+                      background: "rgba(255,255,255,0.05)",
+                      color: "#f8fafc",
+                      borderRadius: 2,
+                      "& input, & .MuiInputBase-input, & .MuiPickersSectionList-sectionContent, & .MuiPickersInputBase-separator, & .MuiPickersSectionList-sectionSeparator, & .MuiPickersSectionList-root": {
+                        color: "#f8fafc",
+                        WebkitTextFillColor: "#f8fafc"
+                      },
+                      "& .MuiPickersTextField-root": {
+                        color: "#f8fafc"
+                      },
+                      "& .MuiPickersSectionList-root *": {
+                        color: "#f8fafc"
+                      },
+                      "& .MuiPickersSectionList-sectionContent, & .MuiPickersSectionList-sectionSeparator, & .MuiPickersInputBase-separator": {
+                        color: "#f8fafc",
+                        WebkitTextFillColor: "#f8fafc",
+                        opacity: 1
+                      },
+                      "& .MuiPickersSectionList-root [role='spinbutton'], & .MuiPickersSectionList-root [contenteditable='true']": {
+                        color: "#f8fafc",
+                        WebkitTextFillColor: "#f8fafc"
+                      },
+                      "& .MuiInputAdornment-root, & .MuiSvgIcon-root": {
+                        color: "#f8fafc"
+                      },
+                      "& fieldset": {
+                        borderColor: "rgba(255,255,255,0.15)"
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "rgba(251,191,36,0.5)"
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#fbbf24"
+                      }
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "rgba(248,250,252,0.72)"
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#fbbf24"
+                    },
+                    "& .MuiFormLabel-root": {
+                      color: "rgba(248,250,252,0.72)"
+                    },
+                    "& .MuiSvgIcon-root": {
+                      color: "#f8fafc"
+                    }
+                  }
+                },
+                field: {
+                  sx: {
+                    color: "#f8fafc",
+                    "& *": {
+                      color: "#f8fafc",
+                      WebkitTextFillColor: "#f8fafc"
+                    }
+                  }
+                }
+              }}
+            />
+          </LocalizationProvider>
 
           <Box
             sx={{
